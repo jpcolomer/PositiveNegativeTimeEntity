@@ -1,16 +1,13 @@
 from pymongo import MongoClient
-from nltk.probability import FreqDist, ConditionalFreqDist
 import nltk
 from nltk.classify.scikitlearn import SklearnClassifier
 from sklearn.svm import SVC, LinearSVC, NuSVC
 from nltk.classify import NaiveBayesClassifier
 import nltk.classify.util, nltk.metrics
-from nltk.collocations import BigramCollocationFinder
-from nltk.metrics import BigramAssocMeasures
 from helper_methods import *
 import random
 import sklearn
-import numpy as np
+from feature_selector import *
 
 
 client = MongoClient()
@@ -45,45 +42,33 @@ def process_documents(cursor):
         features.append((feature, label))
     return features
 
-class FeatureSelector:
-	def __init__(self, features):
-		self.feature_scores = {}
-		self.features = features
-		self.features_score(features)
 
-	def feature_lists(self, features):
-		feature_fd = FreqDist()
-		cond_feature_fd = ConditionalFreqDist()
-		for feature in features:
-			for key in feature[0]:
-				feature_fd[key] += 1
-				cond_feature_fd[feature[1]][key] += 1
-		return (feature_fd, cond_feature_fd)
+def multiple_classification(feature_selector, train_featurs, validationFeatures,num,i,feat_num):
+    train_features = feature_selector.reprocess_features(feat_num)
+    print "Evaluating batch ", i, ", ", feat_num,"features and with ", len(train_features), "examples"
 
-	def features_score(self, features):
-		if self.feature_scores:
-			return self.feature_scores
-		feature_fd, cond_feature_fd = self.feature_lists(features)
-		pos_feature_count = cond_feature_fd['POSITIVE_TIME'].N()
-		neg_feature_count = cond_feature_fd['NEGATIVE_TIME'].N()
-		total_feature_count = pos_feature_count + neg_feature_count
-		self.total_number_of_features = total_feature_count
+    classifier = NaiveBayesClassifier.train(train_features)
 
-		for feature, freq in feature_fd.iteritems():
-			pos_score = BigramAssocMeasures.chi_sq(cond_feature_fd['POSITIVE_TIME'][feature], (freq, pos_feature_count), total_feature_count)
-			neg_score = BigramAssocMeasures.chi_sq(cond_feature_fd['NEGATIVE_TIME'][feature], (freq, neg_feature_count), total_feature_count)
-			self.feature_scores[feature] = pos_score + neg_score
-		return self.feature_scores
+    performances = {}
+    performances['NB'] = evaluate_classifier(classifier, validationFeatures)
 
-	def best_n_features(self, number):
-		featureScores = self.feature_scores
-		best_vals = sorted(featureScores.iteritems(), key=lambda (w, s): s, reverse=True)[:number]
-		best_features = set([w for w, s in best_vals])
-		return best_features
+    print "--------------------------"
+    print "Linear SVC with L1 penalty"
+    LinearSVC_classifier = SklearnClassifier(LinearSVC(penalty='l1', dual=False))
+    LinearSVC_classifier.train(train_features)
 
-	def reprocess_features(self, number):
-		best_features = self.best_n_features(number)
-		return [(dict([(word, True) for word in feature if word in best_features]), label) for feature, label in self.features]
+    performances['SVM L1'] = evaluate_classifier(LinearSVC_classifier, validationFeatures)
+
+    print "--------------------------"
+    print "Linear SVC with L2 penalty"
+    LinearSVC_classifierL2 = SklearnClassifier(LinearSVC(penalty='l2', dual=True))
+    LinearSVC_classifierL2.train(train_features)
+
+    performances['SVM L2'] = evaluate_classifier(LinearSVC_classifierL2, validationFeatures)
+    print "--------------------------"
+    print "--------------------------"
+    value_key = "values.cut({}).cutNb({}).featsNb({})".format(int(num),i,feat_num)
+    #db.performances.update_one({"performances_id": 1}, {"$set": {value_key: performances}}, upsert=True)
 
 pos_features = process_documents(pos_cursor)
 neg_features = process_documents(neg_cursor)
@@ -109,31 +94,7 @@ for num in range(1,9):
         number_of_features = feature_selector.total_number_of_features
         feature_range = [15,50,100,500,1000,2000,5000,10000,15000,number_of_features]
         for feat_num in feature_range:
-            #performances["cut()".format(num)]["cutNb()".format(i)]["featsNb()".format(feat_num)] = {}
-            train_features = feature_selector.reprocess_features(feat_num)
-            print "Evaluating batch ", i, ", ", feat_num,"features and with ", len(train_features), "examples"
+            multiple_classification(feature_selector, train_features, validationFeatures,num,i,feat_num)
 
-            classifier = NaiveBayesClassifier.train(train_features)
-
-            performances = {}
-            performances['NB'] = evaluate_classifier(classifier, validationFeatures)
-
-            print "--------------------------"
-            print "Linear SVC with L1 penalty"
-            LinearSVC_classifier = SklearnClassifier(LinearSVC(penalty='l1', dual=False))
-            LinearSVC_classifier.train(train_features)
-
-            performances['SVM L1'] = evaluate_classifier(LinearSVC_classifier, validationFeatures)
-
-            print "--------------------------"
-            print "Linear SVC with L2 penalty"
-            LinearSVC_classifierL2 = SklearnClassifier(LinearSVC(penalty='l2', dual=True))
-            LinearSVC_classifierL2.train(train_features)
-
-            performances['SVM L2'] = evaluate_classifier(LinearSVC_classifierL2, validationFeatures)
-            print "--------------------------"
-            print "--------------------------"
-            value_key = "values.cut({}).cutNb({}).featsNb({})".format(int(num),i,feat_num)
-            db.performances.update_one({"performances_id": 1}, {"$set": {value_key: performances}}, upsert=True)
 
 print performances
