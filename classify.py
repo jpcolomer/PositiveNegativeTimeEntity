@@ -98,39 +98,42 @@ pos_train_index = int(0.8*len(pos_features))
 validationFeatures = pos_features[:pos_train_index] + neg_features[:neg_train_index]
 
 num = 8.0
-performances = {}
+#performances = {}
 for num in range(1,9):
     num = float(num)
-    performances[num] = {}
+    #performances["cut()".format(num)] = {}
     for i in range(0,int(num)):
-        performances[num][i] = {}
+        #performances["cut()".format(num)]["cutNb()".format(i)] = {}
         train_features = pos_features[int(i/num*pos_train_index):int((i+1)/num*pos_train_index)] + neg_features[neg_train_index:]
         feature_selector = FeatureSelector(train_features)
         number_of_features = feature_selector.total_number_of_features
         feature_range = [15,50,100,500,1000,2000,5000,10000,15000,number_of_features]
         for feat_num in feature_range:
-            performances[num][i][feat_num] = {}
+            #performances["cut()".format(num)]["cutNb()".format(i)]["featsNb()".format(feat_num)] = {}
             train_features = feature_selector.reprocess_features(feat_num)
             print "Evaluating batch ", i, ", ", feat_num,"features and with ", len(train_features), "examples"
 
             classifier = NaiveBayesClassifier.train(train_features)
 
-            performances[num][i][feat_num]['NB'] = evaluate_classifier(classifier, validationFeatures)
+            performances = {}
+            performances['NB'] = evaluate_classifier(classifier, validationFeatures)
 
             print "--------------------------"
             print "Linear SVC with L1 penalty"
             LinearSVC_classifier = SklearnClassifier(LinearSVC(penalty='l1', dual=False))
             LinearSVC_classifier.train(train_features)
 
-            performances[num][i][feat_num]['SVM L1'] = evaluate_classifier(LinearSVC_classifier, validationFeatures)
+            performances['SVM L1'] = evaluate_classifier(LinearSVC_classifier, validationFeatures)
 
             print "--------------------------"
             print "Linear SVC with L2 penalty"
-            LinearSVC_classifier = SklearnClassifier(LinearSVC())
-            LinearSVC_classifier.train(train_features)
+            LinearSVC_classifierL2 = SklearnClassifier(LinearSVC(penalty='l2', dual=True))
+            LinearSVC_classifierL2.train(train_features)
 
-            performances[num][i][feat_num]['SVM L2'] = evaluate_classifier(LinearSVC_classifier, validationFeatures)
+            performances['SVM L2'] = evaluate_classifier(LinearSVC_classifierL2, validationFeatures)
             print "--------------------------"
             print "--------------------------"
+            value_key = "values.cut({}).cutNb({}).featsNb({})".format(int(num),i,feat_num)
+            db.performances.update_one({"performances_id": 1}, {"$set": {value_key: performances}}, upsert=True)
 
-db.performances.update_one({"performances": 1}, {"$set": {"values": performances}}, upsert=True)
+print performances
