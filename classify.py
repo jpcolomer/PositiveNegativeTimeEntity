@@ -8,19 +8,11 @@ from helper_methods import *
 import random
 import sklearn
 from feature_selector import *
+from pos_tag_feature_extractor import *
 
 
 client = MongoClient()
 db = client.pnex
-
-
-vocaBularyCursor = db.pntime.find({"vocabulary_id": { "$exists": True }})
-
-vocabulary = db.command({'distinct': 'pntime', 'key': 'dictionary'})
-vocabulary = vocabulary['values']
-
-dictionary = [set(vocab.keys()) for vocab in vocabulary]
-dictionary = set().union(*dictionary)
 
 pos_cursor = db.pntime.find({"lemmasDict": { "$exists": True }, "vocabulary_id": { "$exists": False }, 'dataPoint.label': 'POSITIVE_TIME', 'dataPoint.rand': {'$lt': 0.8}})
 neg_cursor = db.pntime.find({"lemmasDict": { "$exists": True }, "vocabulary_id": { "$exists": False }, 'dataPoint.label': 'NEGATIVE_TIME', 'dataPoint.rand': {'$lt': 0.8}})
@@ -75,26 +67,20 @@ neg_features = process_documents(neg_cursor)
 
 
 neg_train_index = int(0.8*len(neg_features))
-
 pos_train_index = int(0.8*len(pos_features))
 
 #nbPosEx = int(pos_train_index*0.05)
 #trainFeatures = random.sample(pos_features[pos_train_index:],nbPosEx) + neg_features[neg_train_index:]
 validationFeatures = pos_features[:pos_train_index] + neg_features[:neg_train_index]
 
+## Cross validate for number of features,number of positive buckets and the bucket itself
 num = 8.0
-#performances = {}
 for num in range(1,9):
     num = float(num)
-    #performances["cut()".format(num)] = {}
     for i in range(0,int(num)):
-        #performances["cut()".format(num)]["cutNb()".format(i)] = {}
         train_features = pos_features[int(i/num*pos_train_index):int((i+1)/num*pos_train_index)] + neg_features[neg_train_index:]
         feature_selector = FeatureSelector(train_features)
         number_of_features = feature_selector.total_number_of_features
         feature_range = [15,50,100,500,1000,2000,5000,10000,15000,number_of_features]
         for feat_num in feature_range:
             multiple_classification(feature_selector, train_features, validationFeatures,num,i,feat_num)
-
-
-print performances
