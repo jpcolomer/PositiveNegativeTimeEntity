@@ -1,7 +1,7 @@
 # Predict Positive or Negative dialogue act
 
 ## Dataset Peculiarities
-* The first peculiarity is that the dataset is quite inbalanced. There are ~80.000 examples and only ~7% have NEGATIVE_TIME
+* The first peculiarity is that the dataset is quite imbalanced. There are ~80.000 examples and only ~7% have NEGATIVE_TIME
    label.
 * Second, a sentence can have more than one Time entity with different
   dialogue acts. For example: *I'm not available on Tuesday, but
@@ -67,7 +67,7 @@ Clearly, there was a problem with the recall, hence with the F-measure on Negati
 
 I decided to reduce the dataset by using lemmatization and stopwords.
 
-Additionally, in order to address the issue of the inbalanced dataset I
+Additionally, in order to address the issue of the imbalanced dataset I
 divided the positive training examples into an arbitrary number between
 1 and 8, then pick one of those buckets and merge it with the negative
 examples. In other words I undersampled the positive examples and the
