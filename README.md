@@ -45,7 +45,7 @@ The development dataset was divided into training and validation, and
 again 80% of the development dataset was used for training and the rest
 for validation.
 
-As a baseline I trained a Naive Bayes classifier with the training set
+As a baseline I trained Naive Bayes, SVM L1, SVM L@ classifiers with the training set
 and evaluated it on the validation set.
 
 |Naive Bayes | Precision | Recall | F-measure|
@@ -54,22 +54,36 @@ and evaluated it on the validation set.
 |Negative | 0.329474718794 | 0.815846403461 | 0.469389342668 |
 
 
+|SVM L1 | Precision | Recall | F-measure|
+|------------|-----------|--------|----------|
+|Positive | 0.953732744671 |  0.998118375112 | 0.975420889179 |
+|Negative | 0.938858695652 | 0.373715521904 | 0.534622823985 |
+
+|SVM L2 | Precision | Recall | F-measure|
+|------------|-----------|--------|----------|
+|Positive | 0.955316209886 | 0.997658422362 | 0.976028307869 |
+|Negative | 0.929024081115 | 0.396430502975 | 0.555724033359 |
+
 Clearly, there was a problem with the performance on Negative examples.
 
 I decided to reduce the dataset by using lemmatization and stopwords.
 
 Additionally, in order to address the issue of the inbalanced dataset I
 divided the positive training examples into an arbitrary number between
-1 and 8, then pick one of those divisions and merge it with the negative
-examples. In other words I undersampled the positive examples.
+1 and 8, then pick one of those buckets and merge it with the negative
+examples. In other words I undersampled the positive examples and the
+number of positive examples used as chosen by cross validation.
 
 Next, I runned a feature selection process to extract the high
 information unigrams.
 
-The number of divisions, which division, and the number of features were
+The number of divisions, which bucket, and the number of features were
 selected using cross validation simultaneously.
 The classifiers were trained with each of these divisions
 and evaluated with the validation dataset.
 
+The graphs below show the maximum F measure among all numbers of divisions
+and positive bucket selected for a specific number of features. In other
+words.
 ![Max Neg F measure](/neg_f_measure.png?raw=true)
 ![Max Pos F measure](/pos_f_measure.png?raw=true)
