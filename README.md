@@ -45,7 +45,7 @@ The development dataset was divided into training and validation, and
 again 80% of the development dataset was used for training and the rest
 for validation.
 
-As a baseline I trained Naive Bayes, SVM L1, SVM L@ classifiers with the training set
+As a baseline I trained Naive Bayes, SVM L1, SVM L2 classifiers with the training set
 and evaluated it on the validation set.
 
 |Naive Bayes | Precision | Recall | F-measure|
@@ -79,7 +79,7 @@ information unigrams.
 The number of divisions, which bucket, and the number of features were
 selected using cross validation simultaneously.
 The classifiers were trained with each of these divisions
-and evaluated with the validation dataset.
+and evaluated using the validation dataset.
 
 The graphs below show the maximum F measure among all numbers of divisions
 and positive bucket selected for a specific number of features. In other
@@ -106,7 +106,7 @@ The performance of the tunned model against the validation dataset is:
 |Positive | 0.972502348888 |  0.973803600176 | 0.97315253954 |
 |Negative | 0.655200880572 | 0.643861546782 | 0.64948172395 |
 
-Finally, the tunned model was evaluated with the test dataset.
+Finally, the tunned model was evaluated using the test dataset.
 
 |SVM L1 | Precision | Recall | F-measure|
 |------------|-----------|--------|----------|
