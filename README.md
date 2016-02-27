@@ -50,21 +50,20 @@ and evaluated it on the validation set.
 
 |Naive Bayes | Precision | Recall | F-measure|
 |------------|-----------|--------|----------|
-|Positive | 0.983928065704 | 0.871631368778 | 0.92438167245 |
-|Negative | 0.329474718794 | 0.815846403461 | 0.469389342668 |
-
+|Positive | 0.985006412499 | 0.883151094478 | 0.93130208563 |
+|Negative | 0.353424340583 | 0.826122228231 | 0.495057527143 |
 
 |SVM L1 | Precision | Recall | F-measure|
 |------------|-----------|--------|----------|
-|Positive | 0.953732744671 |  0.998118375112 | 0.975420889179 |
-|Negative | 0.938858695652 | 0.373715521904 | 0.534622823985 |
+|Positive | 0.953855070147 |  0.997867491794 | 0.975365028763 |
+|Negative | 0.931589537223 | 0.375608436993 | 0.535363268452 |
 
 |SVM L2 | Precision | Recall | F-measure|
 |------------|-----------|--------|----------|
-|Positive | 0.955316209886 | 0.997658422362 | 0.976028307869 |
-|Negative | 0.929024081115 | 0.396430502975 | 0.555724033359 |
+|Positive | 0.955461208796 | 0.997470259873 | 0.976013910909 |
+|Negative | 0.924137931034 | 0.398593834505 | 0.556962025316 |
 
-Clearly, there was a problem with the performance on Negative examples.
+Clearly, there was a problem with the recall, hence with the F-measure on Negative examples.
 
 I decided to reduce the dataset by using lemmatization and stopwords.
 
@@ -87,3 +86,44 @@ and positive bucket selected for a specific number of features. In other
 words.
 ![Max Neg F measure](/neg_f_measure.png?raw=true)
 ![Max Pos F measure](/pos_f_measure.png?raw=true)
+
+The best classifier in terms of negative F measure is the SVM L1 with 6
+divisions and using the second bucket and 43.000 features.
+
+Next, I experimented with the different features and found out that by
+not using the negation neither removing the stopwords the Negative F
+measure increased by 2%.
+
+The next step was crossvalidating the cost parameter of this classifier.
+By using C=0.7 it achieves the maximum Negative F-measure.
+
+![Cross validate cost C](/c_cross_val.png?raw=true)
+
+The performance of the tunned model against the validation dataset is:
+
+|SVM L1 | Precision | Recall | F-measure|
+|------------|-----------|--------|----------|
+|Positive | 0.972502348888 |  0.973803600176 | 0.97315253954 |
+|Negative | 0.655200880572 | 0.643861546782 | 0.64948172395 |
+
+Finally, the tunned model was evaluated with the test dataset.
+
+|SVM L1 | Precision | Recall | F-measure|
+|------------|-----------|--------|----------|
+|Positive | 0.974849094567 |  0.971266288005 | 0.973054393305 |
+|Negative | 0.635284139101 | 0.666370106762 | 0.650455927052 |
+
+Although, the F-measure increased ~0.2 points in the validation dataset
+and the performance on the test dataset is consistent, it's still not good
+enough. I believe I have to use more advanced features in orther to
+achieve a better performance.
+
+One simple option that I didn't experiment is using Bigrams.
+
+But I think that to correctly address the problem of multiple time
+entities I would have to use a dependency tree and extract information
+from the edges of the graph. Unfortunately, I still don't know how to do
+this.
+
+Finally, like in sentiment analysis, the use of lexicons in this
+problem could also increment the performance.

@@ -124,5 +124,5 @@ def evaluate_on_test_data():
     evaluate_classifier(LinearSVC_classifier, testing_data)
 
 
-#classify_one_combination(6.0,2,48013)
+classify_one_combination(6.0,2,48013)
 evaluate_on_test_data()
