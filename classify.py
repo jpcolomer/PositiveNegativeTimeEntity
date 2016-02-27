@@ -66,21 +66,22 @@ def classify_by_bucket(document_processor,num,i):
         train_features = feature_selector.reprocess_features(feat_num)
         multiple_classification(train_features, validationFeatures,num,i,feat_num)
 
-def classify_one_combination(num,i,feat_num):
+def classify_one_combination(num,i,feat_num=None):
     classification_parameters= get_parameters_to_classify(num,i,feat_num)
     train_features = classification_parameters[0]
     validationFeatures = classification_parameters[1]
     multiple_classification(train_features, validationFeatures,num,i,feat_num)
 
-def get_parameters_to_classify(num,i,feat_num):
+def get_parameters_to_classify(num,i,feat_num=None):
     document_processor = DocumentProcessor(db)
     pos_features, neg_features = document_processor.extract_features_from_mongo()
     pos_train_index, neg_train_index = document_processor.train_indices()
     train_features = document_processor.train_features(num,i)
     validationFeatures = document_processor.validation_features()
-    feature_selector = FeatureSelector(train_features)
-    number_of_features = feature_selector.total_number_of_features
-    train_features = feature_selector.reprocess_features(feat_num)
+    if feat_num:
+        feature_selector = FeatureSelector(train_features)
+        number_of_features = feature_selector.total_number_of_features
+        train_features = feature_selector.reprocess_features(feat_num)
     train_features = [(Counter(features)+Counter(document_processor.tag_features[i]), label) for i, (features, label) in enumerate(train_features)]
     return (train_features, validationFeatures)
 
