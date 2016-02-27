@@ -71,5 +71,5 @@ selected using cross validation simultaneously.
 The classifiers were trained with each of these divisions
 and evaluated with the validation dataset.
 
-![Max Neg F measure](/neg f-measure.png)
-![Max Pos F measure](/pos f-measure.png)
+![Max Neg F measure](./neg f-measure.png?raw=true)
+![Max Pos F measure](./pos f-measure.png?raw=true)
