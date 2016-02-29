@@ -70,8 +70,9 @@ I decided to reduce the dataset by using lemmatization and stopwords.
 Additionally, in order to address the issue of the imbalanced dataset I
 divided the positive training examples into an arbitrary number between
 1 and 8, then pick one of those buckets and merge it with the negative
-examples. In other words I undersampled the positive examples and the
-number of positive examples used as chosen by cross validation.
+examples. In other words I undersampled the positive examples. As an
+alternative, I tried
+increasing the cost for mislabeling NEGATIVE examples but I didn't get good results.
 
 Next, I runned a feature selection process to extract the high
 information unigrams.
