@@ -34,15 +34,14 @@ penalty and chosed the best among those using cross validation.
 
 The first thing I did was to preprocess the data and get the features
 for the entire dataset. Tokenization, POS-TAGGING and Lemmatization
-was applied to the dataset and the result saved into mongo. This process
+was applied to the dataset and the result saved in mongo. This process
 took a lot of processing power, I had to use a cluster of 20 AWS EC2
 instances in order to get the results in less than 3 hours.
 
-Next I separated the dataset into development and
+Next, I separated the dataset into development and
 testing. 80% of the dataset was used for development and the rest for
 testing.
-The development dataset was divided into training and validation, and
-again 80% of the development dataset was used for training and the rest
+The development dataset was divided into training and validation, and 80% of the development dataset was used for training and the rest
 for validation.
 
 As a baseline I trained Naive Bayes, SVM L1, SVM L2 classifiers with the training set
@@ -65,7 +64,7 @@ and evaluated it on the validation set.
 
 Clearly, there was a problem with the recall, hence with the F-measure on Negative examples.
 
-I decided to reduce the dataset by using lemmatization and stopwords.
+I decided to reduce the features by using lemmatization and stopwords.
 
 Additionally, in order to address the issue of the imbalanced dataset I
 divided the positive training examples into an arbitrary number between
