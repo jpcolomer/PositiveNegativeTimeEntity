@@ -8,27 +8,27 @@
 Wednesday works for me.*
 
 ## Features
-* Unigrams: The first feature included are unigrams as bag-of-words. It only
-  includes the presence of a word.
+* Unigrams: The first feature included are unigrams as bag-of-words. It
+  only includes the presence of a word.
 * POS-TAG: The POS TAG of the 2 previous and 2 following words to the
   Time Entity are included as features.
 * Negation: Negation should be an important feature, since it changes
   the meaning of a word. Therefore, whenever there is a negation in a
-sentence, the *not_* is prepended to the word that are to the right of
+sentence, the *not_* string is prepended to the words that are to the right of
 the negation. For example, *I can't meet on DATE* it turns to *I can't
 not_meet not_on not_Date*
 
-There are more advanced features that can be added like
+There are more advanced features that could be used like
 * Dependency trees
 * Lexicons
 
 ## Classifier
 There should be a lot of features that doesn't add relevant information
 to the model, therefore I think a classifier with a L1 penalty can have
-a good result as I expect that the model is sparse.
+a good performance as I expect the model to be sparse.
 
 I used Naive Bayes, linear SVM with L1 penalty and linear SVM with L2
-penalty and chosed the best among those using cross validation.
+penalty and I chosed the best among those using cross validation.
 
 ## Process
 
@@ -81,16 +81,16 @@ selected using cross validation simultaneously.
 The classifiers were trained with each of these divisions
 and evaluated using the validation dataset.
 
-The graphs below show the maximum F measure among all numbers of divisions
-and positive bucket selected for a specific number of features. In other
-words.
+The graphs below shows the maximum F measure among all numbers of divisions
+and positive bucket selected for a specific number of features.
 ![Max Neg F measure](/neg_f_measure.png?raw=true)
 ![Max Pos F measure](/pos_f_measure.png?raw=true)
 
-The best classifier in terms of negative F measure is the SVM L1 with 6
-divisions and using the second bucket and 43.000 features.
+The best classifier in terms of negative F measure is the SVM L1 by
+dividing the training dataset into 6
+divisions and using the second bucket and ~43.000 features.
 
-Next, I experimented with the different features and found out that by
+Next, I experimented with the different features and I found out that by
 not using the negation neither removing the stopwords the Negative F
 measure increased by 2%.
 
@@ -120,7 +120,7 @@ achieve a better performance.
 
 One simple option that I didn't experiment is using Bigrams.
 
-But I think that to correctly address the problem of multiple time
+But I think that to properly address the problem of multiple time
 entities I would have to use a dependency tree and extract information
 from the edges of the graph. Unfortunately, I still don't know how to do
 this.
